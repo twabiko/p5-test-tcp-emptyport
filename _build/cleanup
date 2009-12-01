@@ -1,0 +1,5 @@
+do{ my $x = {
+       'Test-TCP-EmptyPort-*' => 1,
+       'blib' => 1
+     };
+$x; }
