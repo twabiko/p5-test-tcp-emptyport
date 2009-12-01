@@ -1,5 +1,8 @@
 Revision history for Test-TCP-EmptyPort
 
-0.0.1  Tue Dec  1 23:38:59 2009
+0.0.2  Wed Dec  2 01:13:13 JST 2009
+       add required module.
+
+0.0.1  Tue Dec  1 23:38:59 JST 2009
        Initial release.
 

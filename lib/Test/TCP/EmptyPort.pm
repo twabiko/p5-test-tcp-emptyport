@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 use version;
-our $VERSION = qv('0.0.1');
+our $VERSION = qv('0.0.2');
 use base qw/Exporter/;
 our @EXPORT_OK = qw(tcp_empty_port empty_port);
 use IO::Socket::INET;
