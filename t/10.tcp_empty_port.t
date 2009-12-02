@@ -8,6 +8,7 @@ use IO::Socket::INET;
 use IO::Select;
 
 my $port = tcp_empty_port();
+diag("port: $port/tcp");
 ok(1024 < $port);
 
 my $pid = fork();
@@ -19,7 +20,7 @@ if ($pid == 0) {
         LocalPort => $port,
         Proto => 'tcp',
         Reuse => 1,
-    );
+    ) or die $!;
     my $sock = $servsock->accept;
     chomp(my $line = <$sock>);
     ok($line =~ /client/);
@@ -33,7 +34,7 @@ if ($pid == 0) {
         PeerAddr => '127.0.0.1',
         PeerPort => $port,
         Proto => 'tcp',
-    );
+    ) or die $!;
     print $sock "Hello! I am client! :)\n";
     for (1 .. 5) {
         if (IO::Select->new($sock)->can_read(1)) {
