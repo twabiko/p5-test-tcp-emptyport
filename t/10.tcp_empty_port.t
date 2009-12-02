@@ -1,9 +1,15 @@
+#!perl -T
+use strict;
+use warnings;
 use Test::More tests => 3;
 use Test::TCP::EmptyPort qw(tcp_empty_port);
 use Test::SharedFork;
+use IO::Socket::INET;
+use IO::Select;
 
 my $port = tcp_empty_port();
 ok(1024 < $port);
+
 my $pid = fork();
 if ($pid == 0) {
     # child
@@ -14,23 +20,30 @@ if ($pid == 0) {
         Proto => 'tcp',
         Reuse => 1,
     );
-    ok(my $sock = $servsock->accept);
-    print $sock "testing Test::TCP::EmptyPort\n";
+    my $sock = $servsock->accept;
+    chomp(my $line = <$sock>);
+    ok($line =~ /client/);
+    print $sock "Hello! I am server! ;)\n";
     $sock->close;
     $servsock->close;
+    waitpid($pid, 0);
 } elsif ($pid) {
     # parent
-    sleep 3; # XXX
     my $sock = IO::Socket::INET->new(
         PeerAddr => '127.0.0.1',
         PeerPort => $port,
         Proto => 'tcp',
     );
-    while (my $line = <$sock>) {
-        ok($line =~ /testing Test::TCP::EmptyPort/);
+    print $sock "Hello! I am client! :)\n";
+    for (1 .. 5) {
+        if (IO::Select->new($sock)->can_read(1)) {
+            chomp(my $line = <$sock>);
+            ok($line =~ /server/);
+            last;
+        }
     }
+    $sock->close;
 } else {
     BAIL_OUT($!);
 }
-
 __END__
